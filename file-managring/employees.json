@@ -1,0 +1,34 @@
+{
+  "departments": {
+    "engineering": [
+      {
+        "id": "123",
+        "name": "syedmohamil",
+        "email": "mhamil@gmail.com",
+        "salary": "$100000000"
+      },
+      {
+        "id": "123",
+        "name": "zain",
+        "email": "zain@gmail.com",
+        "salary": "$100000"
+      }
+    ],
+    "hr": [
+      {
+        "id": "123",
+        "name": "faiz",
+        "email": "faiz@gmail.com",
+        "salary": "$1000"
+      }
+    ],
+    "marketing": [
+      {
+        "id": "223",
+        "name": "milad bhai",
+        "email": "milad@gmail.com",
+        "salary": "$100000000"
+      }
+    ]
+  }
+}
