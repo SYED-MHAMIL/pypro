@@ -109,36 +109,36 @@
 #     backup_file(JSON_FILE, "employees")
 
 
-def main():
-    ensure_dirs()
-    old_hashes = load_existing_hashes()
-    new_hashes = {}
-    departments = {}
-    data_files = [f for f in os.listdir(DATA_DIR) if f.endswith('.txt')]
+# def main():
+#     ensure_dirs()
+#     old_hashes = load_existing_hashes()
+#     new_hashes = {}
+#     departments = {}
+#     data_files = [f for f in os.listdir(DATA_DIR) if f.endswith('.txt')]
 
-    any_changes = False
-    for file in data_files:
-        changed = process_department(file, old_hashes, new_hashes, departments)
-        if changed:
-            any_changes = True
+#     any_changes = False
+#     for file in data_files:
+#         changed = process_department(file, old_hashes, new_hashes, departments)
+#         if changed:
+#             any_changes = True
 
-        if any_changes:
-        # Load old JSON to merge unchanged departments
-          if os.path.exists(JSON_FILE):
-            with open(JSON_FILE, 'r') as f:
-                old_json = json.load(f)
-            old_depts = old_json.get("departments", {})
-            for dept in old_depts:
-                if dept not in departments:
-                    departments[dept] = old_depts[dept]  # merge unchanged departments
-        build_json(departments)
+#         if any_changes:
+#         # Load old JSON to merge unchanged departments
+#           if os.path.exists(JSON_FILE):
+#             with open(JSON_FILE, 'r') as f:
+#                 old_json = json.load(f)
+#             old_depts = old_json.get("departments", {})
+#             for dept in old_depts:
+#                 if dept not in departments:
+#                     departments[dept] = old_depts[dept]  # merge unchanged departments
+#         build_json(departments)
 
-        save_hashes(new_hashes)
-        for dept in departments:
-            backup_file(os.path.join(CLEANED_DIR, f"{dept}.csv"), dept)
-        log("Backup complete")
-    else:
-        log("No changes detected, skipping file write/backup")
+#         save_hashes(new_hashes)
+#         for dept in departments:
+#             backup_file(os.path.join(CLEANED_DIR, f"{dept}.csv"), dept)
+#         log("Backup complete")
+#     else:
+#         log("No changes detected, skipping file write/backup")
 
 
 # if __name__ == "__main__":
@@ -201,19 +201,19 @@ def get_hashes(dept):
 
 
 def create_hashFile(hash):
-    with open(HASHES_FILE,'w') as f:
-        json.dump(hash,HASHES_FILE,indent=2)
+
+        with open(HASHES_FILE,'w') as f:
+            json.dump(hash,HASHES_FILE,indent=2)
 
 
 
 
 def load_all_hashes():
-    if  os.path.exists(HASHES_FILE):   
-        try:
+    if  os.path.exists(HASHES_FILE):       
             with open(HASHES_FILE,'r') as f:
                 return json.load(f)
-        except FileNotFoundError:
-            return {}
+    
+    return {}
         
 
     
@@ -221,7 +221,10 @@ def emplyess_json(dept):
     with open(JSON_FILE,'w') as f:
         json.dump(f,JSON_FILE,indent=2)
     
-    
+def build_json(department):
+    with open(JSON_FILE,'w') as f:
+        json.dump({"department" : department},JSON_FILE,)
+
         
 
 
@@ -254,15 +257,30 @@ def process_department(file,old_hashes,new_hashes,departments):
     hashes = get_hashes(all_employees)
     new_hashes[dept]=hashes
     if old_hashes.get(dept) !=new_hashes:
-        path= os.path.join(CLEANED_DIR,filename)
+        path= os.path.join(CLEANED_DIR,f'{dept}.csv')
         with open(path,'w') as f:
             writer = csv.writer(f)
             writer.writerow({"id","name","email","salary"})
             return True
+        departments[dept] = [{"id":emplo,"name":name,"email":email_usr,"salary" :sala} for emplo,name,email_usr,sala in all_employees]
     else:
         return False
 
+def main():
+    cwd = os.getcwd()
+    old_hashes = load_all_hashes()
+    new_hashes = {}
+    departments = {}
+    folder = os.path.join(cwd,DATA_DIR)
+    filesList = os.listdir(folder)
+    # is_changed = False
+    for file in filesList :
+        change = process_department(file,old_hashes,new_hashes,departments)
+        if change:
+            build_json(departments)
+            create_hashFile(new_hashes)
+            # is_changed=True
+        
 
-             
-
-process_department('hr.txt')
+if __name__ == "__main__":
+    main()    
